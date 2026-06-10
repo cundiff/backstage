@@ -3,10 +3,12 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: example-nodejs-template
-  title: Example Node.js Template
-  description: An example template for the scaffolder that creates a simple Node.js service
+  title: Legacy Service (No Golden Path)
+  description: >-
+    Intentionally minimal Node.js scaffold without AGENTS.md — use for Flow 1
+    contrast against the golden-path microservice template.
 spec:
-  owner: user:guest
+  owner: group:default/payments-team
   type: service
 
   # These parameters are used to generate the input form in the frontend, and are
@@ -33,7 +35,7 @@ spec:
           ui:field: RepoUrlPicker
           ui:options:
             allowedHosts:
-              - github.com
+              - gitlab.com
 
   # These steps are executed in the scaffolder backend, using data that we gathered
   # via the parameters above.
@@ -47,12 +49,12 @@ spec:
         values:
           name: ${{ parameters.name }}
 
-    # This step publishes the contents of the working directory to GitHub.
+    # This step publishes the contents of the working directory to GitLab.
     # If you or your organization prefer another default branch name over 'main'
     # you can change that here.
     - id: publish
       name: Publish
-      action: publish:github
+      action: publish:gitlab
       input:
         description: This is ${{ parameters.name }}
         repoUrl: ${{ parameters.repoUrl }}

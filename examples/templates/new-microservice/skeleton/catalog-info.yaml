@@ -1,0 +1,13 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ${{ values.name | dump }}
+  tags:
+    - golden-path
+    - cursor-ready
+    - techdocs
+spec:
+  type: service
+  lifecycle: experimental
+  owner: ${{ values.owner | dump }}
+  system: platform

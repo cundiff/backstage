@@ -1,0 +1,9 @@
+{
+  "name": "legacy-checkout-api",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Legacy checkout API — intentionally no AGENTS.md (Flow 1 contrast)",
+  "scripts": {
+    "start": "node src/index.js"
+  }
+}

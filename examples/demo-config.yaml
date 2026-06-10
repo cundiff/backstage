@@ -1,0 +1,12 @@
+# Demo configuration template — bootstrap substitutes __DEMO_GITLAB_GROUP__
+gitlabGroup: __DEMO_GITLAB_GROUP__
+nopCommerce:
+  gitlabRepo: nopcommerce
+  sourceRemote: https://github.com/cundiff/nopCommerce.git
+  defaultBranch: develop
+repos:
+  paymentsService: payments-service
+  legacyCheckout: legacy-checkout-api
+jira:
+  projectKey: NOP
+  baseUrl: https://builders180.atlassian.net

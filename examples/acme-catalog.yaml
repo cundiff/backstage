@@ -1,0 +1,358 @@
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: ecommerce
+  description: nopCommerce storefront and tax integration
+  links:
+    - url: https://builders180.atlassian.net/browse/NOP
+      title: Jira Board
+      icon: dashboard
+spec:
+  owner: group:default/ecommerce-team
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: payments
+  description: Payment processing mesh
+spec:
+  owner: group:default/payments-team
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: platform
+  description: API gateway, developer portal, and shared infrastructure
+spec:
+  owner: group:default/platform-team
+---
+apiVersion: backstage.io/v1alpha1
+kind: System
+metadata:
+  name: identity
+  description: Authentication and authorization platform
+spec:
+  owner: group:default/identity-team
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: payments-db
+  description: PostgreSQL database for payment records
+  tags:
+    - database
+    - postgres
+spec:
+  type: database
+  lifecycle: production
+  owner: group:default/payments-team
+  system: payments
+---
+apiVersion: backstage.io/v1alpha1
+kind: Resource
+metadata:
+  name: identity-db
+  description: PostgreSQL database for identity records
+  tags:
+    - database
+    - postgres
+spec:
+  type: database
+  lifecycle: production
+  owner: group:default/identity-team
+  system: identity
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: payments-api
+  description: REST API for payment processing
+  links:
+    - url: https://grafana.example.com/d/payments-api
+      title: Grafana Dashboard
+      icon: dashboard
+spec:
+  type: openapi
+  lifecycle: production
+  owner: group:default/payments-team
+  system: payments
+  definition: |
+    openapi: "3.0.0"
+    info:
+      title: Payments API
+      version: "1.0.0"
+    paths:
+      /payments:
+        post:
+          summary: Create a payment
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: checkout-api-v1
+  description: Legacy checkout REST API (deprecated)
+spec:
+  type: openapi
+  lifecycle: deprecated
+  owner: group:default/payments-team
+  system: payments
+  definition: |
+    openapi: "3.0.0"
+    info:
+      title: Checkout API v1
+      version: "1.0.0"
+    paths:
+      /checkout:
+        post:
+          summary: Submit checkout
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: tax-api
+  description: Tax calculation API for storefront orders
+spec:
+  type: openapi
+  lifecycle: production
+  owner: group:default/ecommerce-team
+  system: ecommerce
+  definition: |
+    openapi: "3.0.0"
+    info:
+      title: Tax API
+      version: "1.0.0"
+    paths:
+      /tax/calculate:
+        post:
+          summary: Calculate tax for an order
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: auth-api
+  description: Authentication and token issuance API
+spec:
+  type: openapi
+  lifecycle: production
+  owner: group:default/identity-team
+  system: identity
+  definition: |
+    openapi: "3.0.0"
+    info:
+      title: Auth API
+      version: "1.0.0"
+    paths:
+      /auth/token:
+        post:
+          summary: Issue access token
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: nopcommerce-platform
+  description: nopCommerce storefront monolith — hero demo entity
+  tags:
+    - dotnet
+    - ecommerce
+    - cursor-ready
+  annotations:
+    gitlab.com/project-slug: __DEMO_GITLAB_GROUP__/nopcommerce
+    jira.com/project-key: NOP
+    backstage.io/techdocs-ref: dir:../../examples/docs/nopcommerce-platform
+  links:
+    - url: https://gitlab.com/__DEMO_GITLAB_GROUP__/nopcommerce
+      title: GitLab Repo
+      icon: catalog
+    - url: https://builders180.atlassian.net/browse/NOP
+      title: Jira Board
+      icon: dashboard
+    - url: https://grafana.example.com/d/nopcommerce
+      title: Grafana Dashboard
+      icon: dashboard
+    - url: https://runbooks.example.com/nopcommerce
+      title: Runbook
+      icon: docs
+spec:
+  type: website
+  lifecycle: production
+  owner: group:default/ecommerce-team
+  system: ecommerce
+  dependsOn:
+    - component:default/tax-service
+    - component:default/auth-service
+  consumesApis:
+    - tax-api
+    - auth-api
+    - payments-api
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: tax-service
+  description: Tax calculation service (catalog sub-component of nopCommerce monorepo)
+  tags:
+    - dotnet
+    - tax
+  annotations:
+    gitlab.com/project-slug: __DEMO_GITLAB_GROUP__/nopcommerce
+    backstage.io/source-location: url:https://gitlab.com/__DEMO_GITLAB_GROUP__/nopcommerce/-/tree/develop/services/tax-service
+    jira.com/jql: project = NOP AND summary ~ "tax"
+  links:
+    - url: https://gitlab.com/__DEMO_GITLAB_GROUP__/nopcommerce/-/tree/cursor/tax-service-node-migration-203e
+      title: Migration Branch
+      icon: catalog
+spec:
+  type: service
+  lifecycle: production
+  owner: group:default/ecommerce-team
+  system: ecommerce
+  subcomponentOf: component:default/nopcommerce-platform
+  providesApis:
+    - tax-api
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: payments-service
+  description: Golden-path payment processing microservice (Flow 2 fallback)
+  tags:
+    - golden-path
+    - payments
+    - cursor-ready
+  annotations:
+    gitlab.com/project-slug: __DEMO_GITLAB_GROUP__/payments-service
+    jira.com/project-key: NOP
+  links:
+    - url: https://gitlab.com/__DEMO_GITLAB_GROUP__/payments-service
+      title: GitLab Repo
+      icon: catalog
+    - url: https://builders180.atlassian.net/browse/NOP
+      title: Jira Board
+      icon: dashboard
+spec:
+  type: service
+  lifecycle: production
+  owner: group:default/payments-team
+  system: payments
+  dependsOn:
+    - component:default/auth-service
+    - component:default/ledger-service
+    - resource:default/payments-db
+  consumesApis:
+    - auth-api
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: ledger-service
+  description: Immutable payment ledger (catalog-only)
+  tags:
+    - payments
+spec:
+  type: service
+  lifecycle: production
+  owner: group:default/payments-team
+  system: payments
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: auth-service
+  description: Authentication and authorization service
+  tags:
+    - identity
+  annotations:
+    gitlab.com/project-slug: __DEMO_GITLAB_GROUP__/auth-service
+  links:
+    - url: https://gitlab.com/__DEMO_GITLAB_GROUP__/auth-service
+      title: GitLab Repo
+      icon: catalog
+spec:
+  type: service
+  lifecycle: production
+  owner: group:default/identity-team
+  system: identity
+  dependsOn:
+    - resource:default/identity-db
+  providesApis:
+    - auth-api
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: notification-service
+  description: Platform notification dispatcher
+  tags:
+    - platform
+  annotations:
+    gitlab.com/project-slug: __DEMO_GITLAB_GROUP__/notification-service
+  links:
+    - url: https://gitlab.com/__DEMO_GITLAB_GROUP__/notification-service
+      title: GitLab Repo
+      icon: catalog
+spec:
+  type: service
+  lifecycle: production
+  owner: group:default/platform-team
+  system: platform
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: checkout-api
+  description: Legacy checkout API (deprecated — no AGENTS.md golden path)
+  tags:
+    - legacy
+    - deprecated
+  annotations:
+    gitlab.com/project-slug: __DEMO_GITLAB_GROUP__/legacy-checkout-api
+  links:
+    - url: https://gitlab.com/__DEMO_GITLAB_GROUP__/legacy-checkout-api
+      title: GitLab Repo
+      icon: catalog
+spec:
+  type: service
+  lifecycle: deprecated
+  owner: group:default/payments-team
+  system: payments
+  consumesApis:
+    - checkout-api-v1
+    - payments-api
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: api-gateway
+  description: Edge API gateway routing traffic to backend services
+  tags:
+    - platform
+  links:
+    - url: https://grafana.example.com/d/api-gateway
+      title: Grafana Dashboard
+      icon: dashboard
+spec:
+  type: service
+  lifecycle: production
+  owner: group:default/platform-team
+  system: platform
+  dependsOn:
+    - component:default/checkout-api
+    - component:default/payments-service
+---
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: developer-portal
+  description: Acme Developer Portal (this Backstage instance)
+  tags:
+    - platform
+  links:
+    - url: http://localhost:3000
+      title: Open Portal
+      icon: catalog
+spec:
+  type: website
+  lifecycle: production
+  owner: group:default/platform-team
+  system: platform

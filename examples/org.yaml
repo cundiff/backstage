@@ -5,13 +5,54 @@ kind: User
 metadata:
   name: guest
 spec:
-  memberOf: [guests]
+  memberOf: [engineering]
 ---
 # https://backstage.io/docs/features/software-catalog/descriptor-format#kind-group
 apiVersion: backstage.io/v1alpha1
 kind: Group
 metadata:
-  name: guests
+  name: engineering
+  description: Engineering organization
+spec:
+  type: root
+  children: [platform-team, payments-team, identity-team, ecommerce-team]
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: platform-team
+  description: Platform engineering — gateway, portal, shared infra
 spec:
   type: team
+  parent: engineering
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: payments-team
+  description: Payment processing and ledger services
+spec:
+  type: team
+  parent: engineering
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: identity-team
+  description: Authentication and authorization services
+spec:
+  type: team
+  parent: engineering
+  children: []
+---
+apiVersion: backstage.io/v1alpha1
+kind: Group
+metadata:
+  name: ecommerce-team
+  description: E-commerce storefront and tax integration
+spec:
+  type: team
+  parent: engineering
   children: []

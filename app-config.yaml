@@ -1,5 +1,5 @@
 app:
-  title: Scaffolded Backstage App
+  title: Acme Developer Portal
   baseUrl: http://localhost:3000
 
   # Enable all packages by default, this will discover packages from packages/app/package.json
@@ -10,17 +10,38 @@ app:
     - page:catalog:
         config:
           path: /
+    - page:catalog/entity:
+        config:
+          groups:
+            - maintenance:
+                title: Maintenance
+                icon: build
+            - jira:
+                title: Jira
+                icon: dashboard
+    - entity-content:jira-dashboard/entity:
+        config:
+          group: jira
+          title: Jira
+          icon: dashboard
 
 organization:
-  name: My Company
+  name: Acme
 
 backend:
   # Used for enabling authentication, secret is shared by all backend plugins
   # See https://backstage.io/docs/auth/service-to-service-auth for
   # information on the format
-  # auth:
-  #   keys:
-  #     - secret: ${BACKEND_SECRET}
+  auth:
+    externalAccess:
+      - type: static
+        options:
+          token: ${MCP_TOKEN}
+          subject: mcp-clients
+        accessRestrictions:
+          - plugin: mcp-actions
+          - plugin: catalog
+          - plugin: scaffolder
   baseUrl: http://localhost:7007
   listen:
     port: 7007
@@ -48,15 +69,15 @@ backend:
   # workingDirectory: /tmp # Use this to configure a working directory for the scaffolder, defaults to the OS temp-dir
 
 integrations:
-  github:
-    - host: github.com
-      # This is a Personal Access Token or PAT from GitHub. You can find out how to generate this token, and more information
-      # about setting up the GitHub integration here: https://backstage.io/docs/integrations/github/locations#configuration
-      token: ${GITHUB_TOKEN}
-    ### Example for how to add your GitHub Enterprise instance using the API:
-    # - host: ghe.example.net
-    #   apiBaseUrl: https://ghe.example.net/api/v3
-    #   token: ${GHE_TOKEN}
+  gitlab:
+    - host: gitlab.com
+      # This is a Personal Access Token from GitLab. You can find out how to generate this token, and more information
+      # about setting up the GitLab integration here: https://backstage.io/docs/integrations/gitlab/locations
+      token: ${GITLAB_TOKEN}
+    ### Example for how to add your self-hosted GitLab instance:
+    # - host: gitlab.example.com
+    #   apiBaseUrl: https://gitlab.example.com/api/v4
+    #   token: ${GITLAB_TOKEN}
 
 proxy:
   ### Example for how to add a proxy endpoint for the frontend.
@@ -105,13 +126,19 @@ catalog:
   rules:
     - allow: [Component, System, API, Resource, Location]
   locations:
-    # Local example data, file locations are relative to the backend process, typically `packages/backend`
+    # Local example data — Location shim points at enterprise catalog
     - type: file
       target: ../../examples/entities.yaml
 
     # Local example template
     - type: file
       target: ../../examples/template/template.yaml
+      rules:
+        - allow: [Template]
+
+    # Golden-path microservice template
+    - type: file
+      target: ../../examples/templates/new-microservice/template.yaml
       rules:
         - allow: [Template]
 
@@ -123,11 +150,11 @@ catalog:
 
     ## Uncomment these lines to add more example data
     # - type: url
-    #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/all.yaml
+    #   target: https://gitlab.com/backstage/backstage/-/blob/master/packages/catalog-model/examples/all.yaml
 
     ## Uncomment these lines to add an example org
     # - type: url
-    #   target: https://github.com/backstage/backstage/blob/master/packages/catalog-model/examples/acme-corp.yaml
+    #   target: https://gitlab.com/backstage/backstage/-/blob/master/packages/catalog-model/examples/acme-corp.yaml
     #   rules:
     #     - allow: [User, Group]
 
@@ -141,5 +168,29 @@ permission:
 
 # see https://backstage.io/docs/ai/mcp-actions for more details
 mcpActions:
-  name: 'My Company Backstage' # defaults to "backstage"
-  description: 'Tools for managing your software catalog, creating new services from templates, and exploring your developer portal' # optional
+  servers:
+    catalog:
+      name: Backstage Catalog
+      description: Query the software catalog
+      filter:
+        include:
+          - id: 'catalog:*'
+        exclude:
+          - attributes: { destructive: true }
+    scaffolder:
+      name: Backstage Scaffolder
+      description: Create new software from golden-path templates
+      filter:
+        include:
+          - id: 'scaffolder:*'
+
+cursor:
+  maintenance:
+    apiKey: ${CURSOR_API_KEY}
+
+jiraDashboard:
+  instances:
+    - name: default
+      token: ${JIRA_TOKEN}
+      email: ${JIRA_EMAIL}
+      baseUrl: https://builders180.atlassian.net/rest/api/3/

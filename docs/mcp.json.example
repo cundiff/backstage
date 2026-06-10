@@ -1,0 +1,16 @@
+{
+  "mcpServers": {
+    "backstage-catalog": {
+      "url": "http://localhost:7007/api/mcp-actions/v1/catalog",
+      "headers": {
+        "Authorization": "Bearer ${MCP_TOKEN}"
+      }
+    },
+    "backstage-scaffolder": {
+      "url": "http://localhost:7007/api/mcp-actions/v1/scaffolder",
+      "headers": {
+        "Authorization": "Bearer ${MCP_TOKEN}"
+      }
+    }
+  }
+}

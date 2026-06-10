@@ -1,0 +1,86 @@
+apiVersion: scaffolder.backstage.io/v1beta3
+# https://backstage.io/docs/features/software-catalog/descriptor-format#kind-template
+kind: Template
+metadata:
+  name: new-microservice
+  title: New Microservice (Golden Path)
+  description: Golden-path microservice scaffold with AGENTS.md for Cursor-ready development
+  tags:
+    - golden-path
+    - cursor-ready
+    - techdocs
+spec:
+  owner: group:default/platform-team
+  type: service
+
+  parameters:
+    - title: Service details
+      required:
+        - name
+        - owner
+        - stack
+      properties:
+        name:
+          title: Name
+          type: string
+          description: Unique name of the component (e.g. payments-service)
+          ui:autofocus: true
+        owner:
+          title: Owner
+          type: string
+          description: Catalog owner entity ref (e.g. group:default/platform-team)
+          default: group:default/platform-team
+        stack:
+          title: Stack
+          type: string
+          description: Primary runtime stack (node-ts scaffolded for live demo)
+          enum:
+            - node-ts
+            - python
+            - go
+          default: node-ts
+    - title: Choose a location
+      required:
+        - repoUrl
+      properties:
+        repoUrl:
+          title: Repository Location
+          type: string
+          ui:field: RepoUrlPicker
+          ui:options:
+            allowedHosts:
+              - gitlab.com
+
+  steps:
+    - id: fetch-base
+      name: Fetch Skeleton
+      action: fetch:template
+      input:
+        url: ./skeleton
+        values:
+          name: ${{ parameters.name }}
+          owner: ${{ parameters.owner }}
+          stack: ${{ parameters.stack }}
+
+    - id: publish
+      name: Publish
+      action: publish:gitlab
+      input:
+        description: Golden-path microservice ${{ parameters.name }}
+        repoUrl: ${{ parameters.repoUrl }}
+        defaultBranch: main
+
+    - id: register
+      name: Register
+      action: catalog:register
+      input:
+        repoContentsUrl: ${{ steps['publish'].output.repoContentsUrl }}
+        catalogInfoPath: /catalog-info.yaml
+
+  output:
+    links:
+      - title: Repository
+        url: ${{ steps['publish'].output.remoteUrl }}
+      - title: Open in catalog
+        icon: catalog
+        entityRef: ${{ steps['register'].output.entityRef }}

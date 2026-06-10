@@ -1,0 +1,14 @@
+---
+description: Conventions for ${{ values.name }} microservice
+globs:
+  - src/**
+  - package.json
+  - catalog-info.yaml
+---
+
+# ${{ values.name }} rules
+
+- Follow `AGENTS.md` at the repo root for logging, errors, and tests.
+- Owner: `${{ values.owner }}` | Stack: `${{ values.stack }}`
+- Do not add dependencies without updating `DEPENDENCIES.md`.
+- Replace `console.log` with structured logging per AGENTS.md.

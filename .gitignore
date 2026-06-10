@@ -30,6 +30,9 @@ node_modules/
 .env
 .env.test
 
+# Local Cursor MCP config (contains bearer token)
+.cursor/mcp.json
+
 # Build output
 dist
 dist-types

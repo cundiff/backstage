@@ -1,0 +1,12 @@
+apiVersion: backstage.io/v1alpha1
+kind: Component
+metadata:
+  name: checkout-api
+  tags:
+    - legacy
+    - deprecated
+spec:
+  type: service
+  lifecycle: deprecated
+  owner: group:default/payments-team
+  system: payments
