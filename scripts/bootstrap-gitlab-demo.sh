@@ -9,7 +9,7 @@ REPO_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 : "${GITLAB_TOKEN:?GITLAB_TOKEN is required}"
 : "${DEMO_GITLAB_GROUP:?DEMO_GITLAB_GROUP is required}"
 
-NOPCOMMERCE_SOURCE="${NOPCOMMERCE_SOURCE:-/Users/iancundiff/demos/stacks/dotnet/nopCommerce}"
+NOPCOMMERCE_SOURCE="${NOPCOMMERCE_SOURCE:-}"
 GITLAB_HOST="${GITLAB_HOST:-gitlab.com}"
 GITLAB_API="https://${GITLAB_HOST}/api/v4"
 WORK_DIR="${TMPDIR:-/tmp}/backstage-demo-bootstrap-$$"
@@ -95,11 +95,15 @@ push_repo() {
 
 prepare_nopcommerce() {
   local dest="${WORK_DIR}/nopcommerce"
-  log "Preparing nopCommerce from ${NOPCOMMERCE_SOURCE}"
+  if [[ -n "${NOPCOMMERCE_SOURCE}" ]]; then
+    log "Preparing nopCommerce from ${NOPCOMMERCE_SOURCE}"
+  else
+    log "Preparing nopCommerce from github.com/cundiff/nopCommerce (develop)"
+  fi
 
-  if [[ -d "${NOPCOMMERCE_SOURCE}/.git" ]]; then
+  if [[ -n "${NOPCOMMERCE_SOURCE}" && -d "${NOPCOMMERCE_SOURCE}/.git" ]]; then
     git clone --branch develop --single-branch "${NOPCOMMERCE_SOURCE}" "${dest}"
-  elif [[ -d "${NOPCOMMERCE_SOURCE}" ]]; then
+  elif [[ -n "${NOPCOMMERCE_SOURCE}" && -d "${NOPCOMMERCE_SOURCE}" ]]; then
     cp -a "${NOPCOMMERCE_SOURCE}" "${dest}"
     rm -rf "${dest}/.git" 2>/dev/null || true
   else

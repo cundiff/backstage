@@ -66,9 +66,10 @@ spec:
       name: Publish
       action: publish:gitlab
       input:
-        description: Golden-path microservice ${{ parameters.name }}
         repoUrl: ${{ parameters.repoUrl }}
         defaultBranch: main
+        settings:
+          description: Golden-path microservice ${{ parameters.name }}
 
     - id: register
       name: Register

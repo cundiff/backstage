@@ -1,7 +1,7 @@
 # Seed Full Demo Data (Backstage + Cursor + Jira + nopCommerce)
 
 **Plan ID:** `enterprise-demo-seed`  
-**Status:** Not started — implementation plan only  
+**Status:** Implemented — merged to `main` (see `docs/demo-setup.md` for runbook)  
 **Repo:** `/Users/iancundiff/demos/platform/backstage`  
 **Backstage version:** 1.51.0 (`backstage.json`)
 

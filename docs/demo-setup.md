@@ -34,7 +34,7 @@ Optional override:
 
 | Variable | Default |
 | --- | --- |
-| `NOPCOMMERCE_SOURCE` | `/Users/iancundiff/demos/stacks/dotnet/nopCommerce` |
+| `NOPCOMMERCE_SOURCE` | *(unset — clones `github.com/cundiff/nopCommerce` `develop`)* |
 
 ## Bootstrap GitLab repos
 

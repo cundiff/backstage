@@ -56,9 +56,10 @@ spec:
       name: Publish
       action: publish:gitlab
       input:
-        description: This is ${{ parameters.name }}
         repoUrl: ${{ parameters.repoUrl }}
         defaultBranch: 'main'
+        settings:
+          description: This is ${{ parameters.name }}
 
     # The final step is to register our new component in the catalog.
     - id: register
