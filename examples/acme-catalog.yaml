@@ -40,9 +40,12 @@ kind: Resource
 metadata:
   name: payments-db
   description: PostgreSQL database for payment records
+  annotations:
+    onedev.transunion.com/jurisdiction: us
   tags:
     - database
     - postgres
+    - us-data
 spec:
   type: database
   lifecycle: production
@@ -54,9 +57,12 @@ kind: Resource
 metadata:
   name: identity-db
   description: PostgreSQL database for identity records
+  annotations:
+    onedev.transunion.com/jurisdiction: emea
   tags:
     - database
     - postgres
+    - emea-data
 spec:
   type: database
   lifecycle: production
@@ -146,6 +152,34 @@ spec:
       /auth/token:
         post:
           summary: Issue access token
+---
+apiVersion: backstage.io/v1alpha1
+kind: API
+metadata:
+  name: onetru-data-access-api
+  description: OneTru Permissioned Data API — the only approved path to consumer and credit records (permissible purpose + FCRA audit)
+  tags:
+    - onetru
+    - consumer-data
+    - tru-guardrails
+  links:
+    - url: https://www.transunion.com/about-us/onetru
+      title: OneTru Platform
+      icon: docs
+spec:
+  type: openapi
+  lifecycle: production
+  owner: group:default/platform-team
+  system: platform
+  definition: |
+    openapi: "3.0.0"
+    info:
+      title: OneTru Permissioned Data API
+      version: "1.0.0"
+    paths:
+      /v1/consumer/{consumerRef}:
+        get:
+          summary: Read a consumer record (requires permissible purpose)
 ---
 apiVersion: backstage.io/v1alpha1
 kind: Component
