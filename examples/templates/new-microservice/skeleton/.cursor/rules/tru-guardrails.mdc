@@ -1,0 +1,66 @@
+---
+description: Tru Guardrails — OneTru + FCRA policy for ${{ values.name }}
+globs:
+  - src/**
+alwaysApply: true
+---
+
+# Tru Guardrails — ${{ values.name }}
+
+OneTru consumer-data and OneDev security policy. These rules are non-negotiable and apply to
+all code in this service. When a request conflicts with a guardrail, refuse and explain why.
+
+- Service: `${{ values.name }}`
+- Cloud: `${{ values.cloud }}`
+- Jurisdiction: `${{ values.jurisdiction }}`
+
+## 1. Permissioned data access only (OneTru core principle)
+
+- Access consumer records ONLY through the OneTru Permissioned Data API client in
+  `src/lib/onetru-data-access.ts` (`@onetru/data-access`).
+- NEVER read consumer data with raw SQL or DB drivers (`pg`, `mysql2`, `knex`, `sequelize`,
+  `prisma`) against consumer or credit schemas. No `SELECT ... FROM consumer*`, no direct
+  connections to bureau datastores.
+- Every access requires a permissible purpose (see rule 4).
+
+## 2. No PII in logs or exception traces
+
+- NEVER log SSN, DOB, full name, address, account numbers, or any credit data.
+- Use tokenized identifiers (e.g. `consumerRef`) instead of raw consumer identifiers.
+- Scrub error objects before logging — never log raw request bodies, DB rows, or API
+  payloads. Exception handlers must redact before emitting.
+- Never return stack traces or internal paths in HTTP responses.
+
+## 3. Jurisdictional data separation (data does not cross borders)
+
+{% if values.jurisdiction == 'emea' %}
+- This is an EMEA service governed by GDPR and local equivalents.
+- NEVER read, import, join, or call US or APAC consumer/credit data.
+- Pin storage and compute to EMEA regions (e.g. `eu-*`).
+{% elif values.jurisdiction == 'apac' %}
+- This is an APAC service governed by local data-protection law.
+- NEVER read, import, join, or call US or EMEA consumer/credit data.
+- Pin storage and compute to APAC regions (e.g. `ap-*`).
+{% else %}
+- This is a US service governed by the FCRA.
+- NEVER read, import, join, or call EMEA or APAC consumer/credit data.
+- Pin storage and compute to US regions (e.g. `us-*`).
+{% endif %}
+- Cross-jurisdiction consumer-data flows are prohibited regardless of convenience.
+
+## 4. FCRA-compliant audit trail
+
+- Any function that reads, writes, or derives consumer records MUST emit a structured audit
+  event via `auditLog()` from `src/lib/onetru-data-access.ts`.
+- Audit events require: `permissiblePurpose`, `consumerRef`, actor, and timestamp.
+- No silent access. If you add a consumer-data path, add the audit call in the same change.
+
+## 5. Secure by design
+
+- NEVER hardcode credentials, tokens, or connection strings. Read them from OneDev-injected
+  environment or secrets at runtime.
+- Encrypt consumer data at rest at the service layer before persistence using the platform
+  crypto module — do not rely solely on storage-level encryption.
+- Keep dependencies minimal and approved (see `DEPENDENCIES.md`).
+
+Follow `AGENTS.md` for stack conventions, logging format, the error envelope, and tests.

@@ -8,7 +8,8 @@ globs:
 
 # ${{ values.name }} rules
 
+- Tru Guardrails in `.cursor/rules/tru-guardrails.mdc` are mandatory: permissioned data access, no PII in logs, jurisdictional separation, FCRA audit trail, secure-by-design.
 - Follow `AGENTS.md` at the repo root for logging, errors, and tests.
-- Owner: `${{ values.owner }}` | Stack: `${{ values.stack }}`
+- Owner: `${{ values.owner }}` | Stack: `${{ values.stack }}` | Cloud: `${{ values.cloud }}` | Jurisdiction: `${{ values.jurisdiction }}`
 - Do not add dependencies without updating `DEPENDENCIES.md`.
 - Replace `console.log` with structured logging per AGENTS.md.

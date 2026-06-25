@@ -2,10 +2,15 @@ apiVersion: backstage.io/v1alpha1
 kind: Component
 metadata:
   name: ${{ values.name | dump }}
+  annotations:
+    onedev.transunion.com/cloud: ${{ values.cloud | dump }}
+    onedev.transunion.com/jurisdiction: ${{ values.jurisdiction | dump }}
   tags:
     - golden-path
     - cursor-ready
     - techdocs
+    - tru-guardrails
+    - ${{ values.jurisdiction }}
 spec:
   type: service
   lifecycle: experimental

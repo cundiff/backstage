@@ -10,9 +10,27 @@ Follow these conventions when making changes.
 | **Name** | ${{ values.name }} |
 | **Owner** | ${{ values.owner }} |
 | **Stack** | ${{ values.stack }} |
+| **Cloud** | ${{ values.cloud }} |
+| **Jurisdiction** | ${{ values.jurisdiction }} |
 
 > **Demo note:** `python` and `go` stack selections currently receive the `node-ts` skeleton.
 > Adapt generated files if you chose a non-TypeScript stack.
+
+## Tru Guardrails (mandatory)
+
+This service follows TransUnion OneTru and OneDev policy. Full rules live in
+`.cursor/rules/tru-guardrails.mdc`. Summary:
+
+1. **Permissioned data access only** — consumer records flow through `@onetru/data-access`
+   (`src/lib/onetru-data-access.ts`). Never use raw SQL or DB drivers against consumer or credit data.
+2. **No PII in logs or traces** — never log SSN, DOB, name, address, account, or credit data;
+   use a tokenized `consumerRef`; scrub error objects.
+3. **Jurisdictional separation** — this is a `${{ values.jurisdiction }}` service; never read,
+   import, or join consumer data from other jurisdictions.
+4. **FCRA audit trail** — every consumer-record function calls
+   `auditLog({ permissiblePurpose, consumerRef })`.
+5. **Secure by design** — no credentials in code (OneDev injects secrets); encrypt consumer
+   data at rest at the service layer.
 
 ## Ownership & catalog
 
@@ -43,6 +61,8 @@ Follow these conventions when making changes.
 - Use a structured logger with levels (`info`, `warn`, `error`) and JSON fields:
   - `service`: `${{ values.name }}`
   - `requestId` when handling HTTP traffic
+- **Never log PII** (SSN, DOB, name, address, account numbers, credit data). Log a tokenized
+  `consumerRef` only, and scrub error objects before logging (Tru Guardrail 2).
 - Existing `console.log` calls are intentional demo debt — migrate them when asked.
 
 ## Error envelope
