@@ -3,10 +3,10 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: example-nodejs-template
-  title: Legacy Service (No Golden Path)
+  title: Legacy Service — Pre-OneDev
   description: >-
-    Intentionally minimal Node.js scaffold without AGENTS.md — use for Flow 1
-    contrast against the golden-path microservice template.
+    Intentionally minimal Node.js scaffold without AGENTS.md or Tru Guardrails —
+    use for Flow 1 contrast against the OneDev golden-path template.
 spec:
   owner: group:default/payments-team
   type: service

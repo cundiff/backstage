@@ -1,5 +1,5 @@
 app:
-  title: Acme Developer Portal
+  title: OneDev — TransUnion Developer Portal
   baseUrl: http://localhost:3000
 
   # Enable all packages by default, this will discover packages from packages/app/package.json
@@ -26,7 +26,7 @@ app:
           icon: dashboard
 
 organization:
-  name: Acme
+  name: TransUnion
 
 backend:
   # Used for enabling authentication, secret is shared by all backend plugins
