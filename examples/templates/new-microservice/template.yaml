@@ -3,11 +3,13 @@ apiVersion: scaffolder.backstage.io/v1beta3
 kind: Template
 metadata:
   name: new-microservice
-  title: New Microservice (Golden Path)
-  description: Golden-path microservice scaffold with AGENTS.md for Cursor-ready development
+  title: New OneDev Service (Golden Path)
+  description: OneDev golden-path service with Tru Guardrails (OneTru + FCRA) baked in as Cursor rules
   tags:
     - golden-path
     - cursor-ready
+    - onedev
+    - tru-guardrails
     - techdocs
 spec:
   owner: group:default/platform-team
@@ -19,6 +21,8 @@ spec:
         - name
         - owner
         - stack
+        - cloud
+        - jurisdiction
       properties:
         name:
           title: Name
@@ -39,6 +43,32 @@ spec:
             - python
             - go
           default: node-ts
+        cloud:
+          title: Target cloud
+          type: string
+          description: OneDev target cloud — governance travels with the service across clouds
+          enum:
+            - aws
+            - gcp
+            - private
+          enumNames:
+            - AWS
+            - GCP
+            - Private Cloud
+          default: gcp
+        jurisdiction:
+          title: Data jurisdiction
+          type: string
+          description: Consumer-data jurisdiction — sets data residency and cross-jurisdiction guardrails
+          enum:
+            - us
+            - emea
+            - apac
+          enumNames:
+            - US (FCRA)
+            - EMEA (GDPR)
+            - APAC
+          default: us
     - title: Choose a location
       required:
         - repoUrl
@@ -61,6 +91,8 @@ spec:
           name: ${{ parameters.name }}
           owner: ${{ parameters.owner }}
           stack: ${{ parameters.stack }}
+          cloud: ${{ parameters.cloud }}
+          jurisdiction: ${{ parameters.jurisdiction }}
 
     - id: publish
       name: Publish
@@ -69,7 +101,7 @@ spec:
         repoUrl: ${{ parameters.repoUrl }}
         defaultBranch: main
         settings:
-          description: Golden-path microservice ${{ parameters.name }}
+          description: OneDev golden-path service ${{ parameters.name }} (${{ parameters.cloud }}, ${{ parameters.jurisdiction }})
 
     - id: register
       name: Register

@@ -1,7 +1,17 @@
 image: node:22
 
 stages:
+  - policy
   - test
+
+# OneDev policy gate — Tru Guardrails enforced in the delivery lifecycle (policy-as-code).
+tru-guardrails:
+  stage: policy
+  script:
+    - echo "Running OneDev Tru Guardrails policy checks"
+    - if grep -rqiE 'SELECT[[:space:]].*FROM[[:space:]]+consumer' src; then echo 'Direct consumer SQL is prohibited (Tru Guardrail 1)'; exit 1; fi
+    - if grep -rqE '(glpat-[0-9A-Za-z_-]{20}|AKIA[0-9A-Z]{16}|-----BEGIN [A-Z ]*PRIVATE KEY-----)' src; then echo 'Possible secret detected (Tru Guardrail 5)'; exit 1; fi
+    - echo "Tru Guardrails policy checks passed"
 
 lint-and-test:
   stage: test
