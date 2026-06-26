@@ -189,8 +189,6 @@ cursor:
     apiKey: ${CURSOR_API_KEY}
 
 jiraDashboard:
-  instances:
-    - name: default
-      token: ${JIRA_TOKEN}
-      email: ${JIRA_EMAIL}
-      baseUrl: https://builders180.atlassian.net/rest/api/3/
+  # token must be the full Authorization header value (see .env.example)
+  token: ${JIRA_AUTH_HEADER}
+  baseUrl: https://builders180.atlassian.net/rest/api/3/

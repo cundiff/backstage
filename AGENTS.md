@@ -48,6 +48,8 @@ Sign in at http://localhost:3000 with **Guest** (click ENTER on the Guest card).
 ### Gotchas
 
 - **`.env` is required** for `yarn start` — the start script uses `dotenv -e .env`. Create it from `.env.example` before starting.
+- **Jira auth header** — `@axis-backstage/plugin-jira-dashboard-backend` expects `jiraDashboard.token` to be the **full** `Authorization` header value (e.g. `Basic <base64(email:api_token)>`), not the raw API token. Set `JIRA_AUTH_HEADER` in `.env` (see `.env.example`). Quote values that contain special characters.
+- **Atlassian egress** — Cloud Agent VMs can reach GitLab but may **block** `*.atlassian.net` (TLS `ECONNRESET`). The Jira tab needs `builders180.atlassian.net` on the egress allowlist, or run Jira verification locally.
 - **Catalog components** need `examples/catalog.local.yaml` from bootstrap; groups come from `examples/org.yaml` regardless.
 - **TechDocs generation** uses Docker (`techdocs.generator.runIn: docker` in `app-config.yaml`); Docker is optional for catalog/UI dev.
 - **External integrations** (GitLab scaffolder publish, Jira tab, Cursor maintenance agents, MCP client) need real credentials in `.env`.
